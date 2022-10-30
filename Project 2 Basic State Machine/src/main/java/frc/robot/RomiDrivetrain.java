@@ -57,7 +57,8 @@ public class RomiDrivetrain extends SubsystemBase {
 
   private final DifferentialDriveOdometry mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(0));
 
-
+  // instance variable for the current state of the RomiDrive
+  private RomiState state = RomiState.NORMAL;
 
   /** Creates a new RomiDrivetrain. */
   public RomiDrivetrain() {
@@ -69,12 +70,38 @@ public class RomiDrivetrain extends SubsystemBase {
   }
 
   /**
-   * Commands the drivetrain through an arcade drive style. HINT: this is useful for your purposes.
-   * @param xaxisSpeed The speed at which the robot goes forward and backward. Should be a number between -1 and 1.
-   * @param zaxisRotate The speed at which the spins clockwise and counterclockwise. Should be a number between -1 and 1.
+   * Commands the drivetrain through an arcade drive style. HINT: this is useful
+   * for your purposes.
+   * 
+   * @param xaxisSpeed  The speed at which the robot goes forward and backward.
+   *                    Should be a number between -1 and 1.
+   * @param zaxisRotate The speed at which the spins clockwise and
+   *                    counterclockwise. Should be a number between -1 and 1.
    */
-  public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
-    mDiffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
+
+  public enum RomiState {
+    SLOW, NORMAL, FAST
+  }
+
+  public void setState(RomiState state) {
+    this.state = state;
+  }
+
+  public void arcadeDrive​(double xaxisSpeed, double zaxisRotate) {
+    switch (state) {
+      case SLOW:
+          System.out.println("The Romi is in slow mode");
+          mDiffDrive.arcadeDrive(xaxisSpeed * 0.5, zaxisRotate * 0.5);
+          break;
+      case NORMAL:
+          System.out.println("The Romi is in normal mode");
+          mDiffDrive.arcadeDrive(xaxisSpeed * 0.75, zaxisRotate * 0.75);
+          break;
+      case FAST:
+          System.out.println("The Romi is in fast mode");
+          mDiffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
+          break;
+      }
   }
 
   public void resetEncoders() {
@@ -108,4 +135,5 @@ public class RomiDrivetrain extends SubsystemBase {
     mOdometry.update(Rotation2d.fromDegrees(mGyro.getAngleY()), mLeftEncoder.getDistance(), mRightEncoder.getDistance());
     mField.setRobotPose(mOdometry.getPoseMeters());
   }
+
 }
